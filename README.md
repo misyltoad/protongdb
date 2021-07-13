@@ -13,7 +13,7 @@ The basic usage is as follows:
 
 On any Steam app that you have a prefix for (ie. started the game at least once) you can use
 ```
-protongdb <appid>
+protongdb <appid> [args...]
 ```
 to start it with a debugger.
 
@@ -22,6 +22,8 @@ You can find the appid for the game using the Properties > Updates tab of the ga
 If the game crashes or you hit a breakpoint, you can run `wine-reload` to resolve any symbols, etc.
 
 You can then get a backtrace or step-through the code like a native app.
+
+Unlike Steam, environment variables are inherited from your environment, so specify them before `protongdb` (no need for `%command%` stuff).
 
 ## Special Thanks
 
