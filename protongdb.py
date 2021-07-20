@@ -25,19 +25,24 @@ def enable_logging(info=False):
         format="%(name)s (%(levelname)s): %(message)s")
 
 def normalize_path(path):
+    if not path:
+        return ""
     return path.replace('\\', '/')
 
-def get_launch_executable(appid, appinfo):
+def get_launch_executable(appid, appinfo)   :
     app_infos = []
     for app in appinfo:
         if app["appinfo"]["appid"] == appid:
             launch_infos = app["appinfo"]["config"]["launch"]
             for x in range(0, len(launch_infos)):
                 launch_info = launch_infos[str(x)]
-                if "windows" in launch_info["config"]["oslist"]:
+                if not ("config" in launch_info and "oslist" in launch_info["config"]) or ("windows" in launch_info["config"]["oslist"]):
+                    beta_key = None
+                    if "config" in launch_info:
+                        beta_key = launch_info["config"].get("betakey")
                     arguments = launch_info.get("arguments")
                     arguments = arguments.split() if arguments else []
-                    app_infos.append((launch_info.get("description"), normalize_path(launch_info.get("workingdir")), normalize_path(launch_info["executable"]), arguments))
+                    app_infos.append((launch_info.get("description"), normalize_path(launch_info.get("workingdir")), normalize_path(launch_info["executable"]), beta_key, arguments))
     return app_infos
 
 def prepend_args(x, y, delim):
@@ -126,17 +131,20 @@ def main(args=None):
     # Let the user pick an app configuration, if we only have one,
     # just use that.
     if len(app_infos) == 1:
-        _, working_dir, launch_executable, app_config_args = app_infos[0]
+        _, working_dir, launch_executable, beta_key, app_config_args = app_infos[0]
     else:
         for x in range(0, len(app_infos)):
-            description, working_dir, launch_executable, app_config_args = app_infos[x]
-            print(f"[{x}] {description} ({launch_executable}{list_to_space_str_prefix(app_config_args, ' ')})")
+            description, working_dir, launch_executable, beta_key, app_config_args = app_infos[x]
+            beta_key = None
+            if beta_key:
+                beta_str = f" | Beta: {beta_key} |"
+            print(f"[{x}] {description} ({launch_executable}{list_to_space_str_prefix(app_config_args, ' ')}){beta_str}")
         config_idx = safe_cast(input(f"Select a game configuration to run: "), int)
         print(config_idx)
         if config_idx == None or config_idx not in range(0, len(app_infos)):
             logger.error("Invalid app configuration.")
             return
-        _, working_dir, launch_executable, app_config_args = app_infos[config_idx]
+        _, working_dir, launch_executable, beta_key, app_config_args = app_infos[config_idx]
             
     # Dump wine-reload in /tmp so we can source
     # it from the gdb script.
