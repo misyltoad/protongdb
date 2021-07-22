@@ -136,6 +136,7 @@ def main(args=None):
         for x in range(0, len(app_infos)):
             description, working_dir, launch_executable, beta_key, app_config_args = app_infos[x]
             beta_key = None
+            beta_str = ""
             if beta_key:
                 beta_str = f" | Beta: {beta_key} |"
             print(f"[{x}] {description} ({launch_executable}{list_to_space_str_prefix(app_config_args, ' ')}){beta_str}")
