@@ -34,8 +34,7 @@ def get_launch_executable(appid, appinfo)   :
     for app in appinfo:
         if app["appinfo"]["appid"] == appid:
             launch_infos = app["appinfo"]["config"]["launch"]
-            for x in range(0, len(launch_infos)):
-                launch_info = launch_infos[str(x)]
+            for launch_info in launch_infos.values():
                 if not ("config" in launch_info and "oslist" in launch_info["config"]) or ("windows" in launch_info["config"]["oslist"]):
                     beta_key = None
                     if "config" in launch_info:
